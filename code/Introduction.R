@@ -112,10 +112,62 @@ hist(vd$v1)
 
 ### data from Iversen and Sockie
 # assign c() function output to vector object country
-country <- c("Australia","Austria","Belgium","Canada",
-             "Denmark","Finland","France","Germany","Ireland", "Italy",
-             "Japan","Netherlands","New Zealand","Norway","Sweden","U.K.",
-             "US")
+library(stargazer)
+
+country <- c("Australia","Austria","Belgium","Canada", "Denmark","Finland",
+             "France","Germany","Ireland", "Italy", "Japan","Netherlands",
+             "New Zealand","Norway","Sweden","U.K.", "US")
+
+# assign c() output to object gini.red for reduction in GINI
+gini.red <- c(23.97, NA, 35.56, 21.26, 37.89, 35.17, 25.36, 18.7, NA, 12.13, NA,
+              30.59, NA, 27.52, 37.89, 22.67, 17.6)
+
+# assign c() output to object wage.ineq for wage inequality
+wage.ineq <- c(1.7, NA, 1.64, 1.82, 1.58, 1.68, 1.94, 1.7, NA, 1.63, NA, 1.64,
+               NA, 1.5, 1.58, 1.78, 2.07)
+
+# assign c() output to object pr for electoral system
+pr <- c(0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0)
+
+# use data.frame function to combine four vector objects assign data.frame 
+# function output to data frame is2006apsr
+
+is2006apsr <- data.frame(country, gini.red, wage.ineq, pr)
+
+# produce descriptive statistics table of select variables
+stargazer(is2006apsr, type = "text", title = "Summary Statistics", median = TRUE,
+          covariate.labels = c("GINI reduction", "wage inequality", "PR system"))
+
+# graph distribution of wage inequality
+par(mfrow = c(1, 2))
+boxplot(is2006apsr$wage.ineq)
+hist(is2006apsr$wage.ineq)
+
+
+# graph distribution of electoral system variable pr
+# value of 1 - a proportional representation system 
+# 0 -  a majoritarian system
+barplot(table(is2006apsr$pr))
+
+
+### Export R Output to a File
+# redirect and export console output to a file named output.txt
+sink("output.txt")
+
+# Save a graph into a file of pdf or other formats
+pdf("graph1.pdf")
+hist(v1)
+
+# return back to screen
+dev.off()
+
+# create image files of alternative formats
+bmp("graph1.bmp")
+jpeg("graph1.jpeg")
+png("graph1.png")
+postscript("graph1.ps")
+
+
 
 
 
