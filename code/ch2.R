@@ -50,7 +50,7 @@ pwt7$POP[pwt7$country == "Afghanistan" & pwt7$year == 1954]
 pwt7[5, 4]
 
 # sort data first by country and then by year
-pwt7 <- pwt7[order(pwt7$country, pw7$year), ]
+pwt7 <- pwt7[order(pwt7$country, pwt7$year), ]
 
 # sort data by country (ascending) and by year (descending)
 pwt7 <- pwt7[order(pwt7$country, -pwt7$year), ]
@@ -221,6 +221,84 @@ pwt7.cs <- summaryBy(growth + openk + POP ~ isocode + decade, FUN = c(mean, sd),
 
 # display last observation
 tail(pwt7.cs, n = 1)
+
+# rename variable by changing column name of dataset with
+# names() function and indexing brackets
+names(pwt7)[names(pwt7) == "POP"] <- "population"
+
+# recode variable value
+pwt7$isocode[pwt7$isocode == "CH2"] <- "CHN"
+pwt7$country[pwt7$country == "China Version 1"] <- "China"
+
+# recode hypothetical missing value -999 in rgdpl
+pwt7$rgdpl[pwt7$rgdpl == -999] <- NA
+
+# use label function to assign variable labels
+library(Hmisc)
+
+label(pwt7$isocode) <- "Penn World Table country code"
+label(pwt7$rgdpl) <- "PPP Converted GDP Per Capita (Laspeyres) derived from growth rates of c, g, i, at 2005 constant prices"
+label(pwt7$openk) <- "Openness at 2005 constant prices in percent"
+label(pwt7$pop) <- "Population (in thousands)"
+label(pwt7$growth) <- "annual economic growth rate, based on RGDPL"
+
+# display labels of all variables
+label(pwt7)
+
+
+# show that white space matters for character fields
+isTRUE("USA" == " USA")
+
+# create a new dataset with five select variables excluding CH2 observations
+pwt7.v1 <- pwt7[pwt7$isocode != "CH2",
+                c("country", "isocode", "year","rgdpl","openk")]
+
+# get the same result by using subset function
+pwt7.v2 <- subset(pwt7, isocode != "CH2",
+                  c(country, isocode, year, rgdpl, openk))
+
+# a fuller expression of the same code
+pwt7.v3 <- subset(pwt7, subset = (isocode != "CH2"),
+                  select = c("country", "isocode", "year", "rgdpl", "openk", "POP") )
+
+# Another way to recode variable values
+library(car)
+pwt7$isocode <- recode(pwt7$isocode, "'CH2'='CHN'")
+
+# create a dataset of duplicated observations
+pwt7.d <- pwt7[duplicated(pwt7[, c("isocode", "year")]), ]
+
+# assign a logical value TRUE or FALSE to each observation based on duplicate
+# values for sorting variables, and assign the output to a data object
+
+idx <- duplicated(pwt7[, c("isocode", "year")])
+View(idx)
+table(idx)
+
+library(reshape)
+# apply the rename function to rename three variables and send output to pwt7
+
+pwt7 <- rename(pwt7, c(POP = "population", openk = "trade", rgdpl = "rgdppc"))
+
+# Source of PennWorld TableData
+library(pwt)
+data("pwt7.1")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

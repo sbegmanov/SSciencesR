@@ -1,0 +1,1 @@
+https://www.rug.nl/ggdc/productivity/pwt/?lang=en latest pwt data
