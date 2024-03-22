@@ -3,13 +3,10 @@
 # 3. Learn to prepare data for analysis using R.
 # 4. Learn to conduct null hypothesis testing using R.
 # 5. Learn to construct confidence interval using R.
-# 6. Learn to conduct statistical inference using one-sample t-test and the
-# difference-of-means test.
+# 6. Learn to conduct statistical inference using one-sample t-test and the difference-of-means test.
 
-# install.packages(c("DataCombine", "ggplot2", "Rmisc", "stargazer"), 
-#                  dependencies=TRUE)
-
-# rm(list=ls(all=TRUE))
+# install.packages(c("DataCombine", "ggplot2", "Rmisc", "stargazer"), dependencies = TRUE)
+# rm(list = ls(all = TRUE))
 
 library(tidyverse)
 
@@ -282,7 +279,11 @@ var(pwt7g$growth[pwt7g$year == 1990], na.rm = TRUE)
 
 F.ratio <- var(pwt7g$growth[pwt7g$year == 1960], na.rm = TRUE) / var(pwt7g$growth[pwt7g$year == 1990], na.rm = TRUE)
 
-
+### Statistical power
+# conduct two-tailed and one-tailed one-sample-mean t-tests
+t.test(pwt7g$growth, mu = 0.03)
+t.test(pwt7g$growth, mu = 0.03, alternative = "greater")
+t.test(pwt7g$growth, mu = 0.03, alternative = "less")
 
 
 
