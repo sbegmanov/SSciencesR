@@ -1,12 +1,12 @@
-### When to use R in a research project
+# When to use R in a research project
 # 1. Identify a research problem
 # 2. Survey the literature (Find out what is known about the problem)
 # 3. Formulate a theoretical argument and some testable hypothesis
 # 4. Measure concepts
 # 5. Collect data
-## 6. Prepare data
-## 7. Analyze data
-## 8. Report findings and implications
+# 6. Prepare data
+# 7. Analyze data
+# 8. Report findings and implications
 
 # efficiency of an analysis - a range of tasks (as importing data into software, 
 # merging different datasets together, verifying data, creating new variables, 
@@ -27,11 +27,11 @@ length(v1)
 # find v1's sample mean (two ways: mean function or formula)
 
 mean(v1)
-sum(v1)/length(v1)
+sum(v1) / length(v1)
 
 # find v1's sample variance (variance function or formula)
 var(v1)
-sum((v1-mean(v1))^2)/(length(v1)-1)
+sum((v1 - mean(v1))^2) / (length(v1)  -1)
 
 # find v1's sample standard deviation (function
 # or square root of sample variance)
@@ -152,20 +152,20 @@ barplot(table(is2006apsr$pr))
 
 ### Export R Output to a File
 # redirect and export console output to a file named output.txt
-sink("output.txt")
+sink("data/output.txt")
 
 # Save a graph into a file of pdf or other formats
-pdf("graph1.pdf")
+pdf("figures/graph1.pdf")
 hist(v1)
 
 # return back to screen
 dev.off()
 
 # create image files of alternative formats
-bmp("graph1.bmp")
-jpeg("graph1.jpeg")
-png("graph1.png")
-postscript("graph1.ps")
+bmp("figures/graph1.bmp")
+jpeg("figures/graph1.jpeg")
+png("figures/graph1.png")
+postscript("figures/graph1.ps")
 
 
 

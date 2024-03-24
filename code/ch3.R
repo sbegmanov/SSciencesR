@@ -63,7 +63,7 @@ sd(pwt7g$growth, na.rm = TRUE)
 
 # one sample mean t-test
 # assuming average growth rate is 3%
-# our average growth rate is 2.3%
+# average growth rate is 2.3%
 t.test(pwt7g$growth, mu = 0.03)
 
 

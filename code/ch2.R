@@ -33,7 +33,7 @@ str(pwt7)
 
 # create a figure with three plots set graphic parameters for figure of two rows, 
 # two columns
-par(mfrow=c(2, 2))
+par(mfrow = c(2, 2))
 
 # graph distribution of variable rgdpl in data frame pwt7
 hist(pwt7$rgdpl)
@@ -180,7 +180,6 @@ table(pwt7$decade)
 
 
 ### create leading and lagging variables in a panel data
-## load DataCombine package in order to use slide function
 library(DataCombine)
 
 # sort data first by country and then by year
@@ -263,6 +262,7 @@ pwt7.v3 <- subset(pwt7, subset = (isocode != "CH2"),
 
 # Another way to recode variable values
 library(car)
+
 pwt7$isocode <- recode(pwt7$isocode, "'CH2'='CHN'")
 
 # create a dataset of duplicated observations
