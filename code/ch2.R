@@ -9,6 +9,7 @@ rm(list = ls(all = TRUE))
 
 # Do countries that are more open to international trade grow faster economically 
 # and have higher income?
+
 library(tidyverse)
 
 # import comma-delimited file, create data object pwt7
