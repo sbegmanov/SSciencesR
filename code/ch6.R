@@ -205,9 +205,184 @@ levels(final.85v2$continent) <- c(".Africa", ".C.N.America",
 # model with all regional dummies and no intercept
 lm(logy ~ 0 + continent + open + loglab + logland,  data = final.85v2)
 
-# display model with all regional dummies but one
-# one region will be automatically excluded due to perfect multicollinearity
+# display model with all regional dummies but one region will be automatically 
+# excluded due to perfect multicollinearity
 lm(logy ~ continent + open + loglab + logland, data = final.85v2)
+
+# display full model ouput
+model1.reg <- lm(logy ~ continent + open + loglab + logland, data = final.85v2)
+
+# display model output
+summary(model1.reg)
+
+# compare against original model
+anova(model1, model1.reg)
+
+# interaction model
+model1.int <- lm(logy ~ open * continent + loglab + logland, data = final.85v2)
+
+# compare models
+anova(model1, model1.int)
+anova(model1.reg, model1.int)
+
+# display output
+summary(model1.int)
+
+# The effect maybe due to chance or actually different from zero in the population. 
+library(interplot)
+
+# plot effect of trade conditional on region
+interplot(model1.int, var1 = "open", var2 = "continent") +
+  geom_hline(yintercept = 0, linetype = "dashed")
+
+
+
+library(lmtest)
+library(multiwayvcov)
+
+# estimate OLS model and create output object
+model1 <- lm(logy ~ open + loglab + logland, data = final.85v2)
+
+# show OLS results for comparison
+summary(model1)
+
+#  robust standard errors clustered over a particular unit-level 
+# request clustered variance and covariance matrix
+# for 6 regions are appropriate, here demonstrated for pedagogical purposes
+vcov_region <- cluster.vcov(model1, final.85v2$continent)
+
+# display clustered matrix
+vcov_region
+
+# request test statistics and p values
+model1.cl <- coeftest(model1, vcov_region)
+model1.cl
+
+
+### Influential observations
+library(car)
+
+
+# influence plot for influential observations
+influencePlot(model1)
+
+# create observation id
+final.85v2$id <- as.numeric(row.names(final.85v2))
+
+library(ggplot2)
+
+# identify obs with Cook's D above cutoff
+ggplot(final.85v2, aes(id, .cooksd)) +
+  geom_bar(stat = "identity", position = "identity") +
+  xlab("Obs. Number") + 
+  ylab("Cook's distance") + 
+  geom_hline(yintercept = 0.03) +
+  geom_text(aes(label = ifelse((.cooksd > 0.03), id, "")), 
+            vjust = -0.2, hjust = 0.5)
+
+# list observations whose cook's D above threshold
+final.85v2[final.85v2$.cooksd > 0.03, 
+           c("id", "country", "logy", "open", ".std.resid", ".hat", ".cooksd")]
+
+# re-estimate model1 without Singapore
+model1.no1 <- lm(logy ~ open + loglab + logland, 
+                 data = final.85v2[final.85v2$.cooksd < 0.18, ])
+summary(model1.no1)
+
+# re-estimate model 1 without Singapore and five others
+model1.no2 <- lm(logy ~ open + loglab + logland, 
+                 data = final.85v2[final.85v2$.cooksd < 0.03,])
+summary(model1.no2)
+
+
+### Normality Test
+
+qqPlot(model1, distribution = "t", simulate = TRUE)
+
+# Shapiro-Wilk normality test
+# normality test
+shapiro.test(final.85v2$.resid)
+
+# test log-transformed open variable
+model1.no3 <- lm(logy ~ log(open) + loglab + logland, data = final.85v2)
+
+# normality test
+shapiro.test(residuals(model1.no3))
+
+# show model output
+summary(model1.no3)
+
+### Report findings
+# robustness checks I
+stargazer(model1, model1.q2, model1.wls, model1.hc1, model1.hc3, model1.no1, model1.no2, 
+          type = "text", no.space = TRUE, covariate.labels = NULL, label = "",
+          omit.stat = c("f", "ser"), model.names = FALSE, 
+          dep.var.labels.include = FALSE, dep.var.caption = "",
+          column.labels = c("OLS", "Quadratic", "WLS", "Robust.hc1", "Robust.hc3", 
+                            "Singapore", "outliers"))
+
+# robustness checks II
+stargazer(model1.cl, model1.reg, model1.int, model1.no3, 
+          type = "text", no.space = TRUE, covariate.labels = NULL, label = "", 
+          omit.stat = c("f", "ser"), model.names = FALSE,
+          dep.var.labels.include = FALSE, dep.var.caption = "",
+          column.labels = c("cluster.se", "regions", "interaction", "logopen"))
+
+
+### Miscellaneous
+
+par(mfrow = c(3, 2))
+plot(model1, which = 1:6)
+
+
+library(GGally)
+library(ggplot2)
+
+# pairwise correlation, distribution, and scatter plots
+ggscatmat(final.85v2, columns = c("logy", "open", "loglab", "logland"))
+
+# independent variables vs. diagnostic statistics: residual, sigma, hat, cooksd
+ggnostic(model1)
+
+
+# Test spatial correlation using Moran’s I
+
+morany <- final.85v2[, c("country", "wbcode", "logy", "lat",  "long")]
+head(morany, n = 1)
+
+morany.dist <- as.matrix(dist(cbind(morany$long, morany$lat)))
+
+# find an inverse distance matrix with each off-diagonal entry equal 
+# to 1/(distance between two points)
+morany.dist.inv <- 1 / morany.dist
+
+# replace diagonal entries with zero
+diag(morany.dist.inv) <- 0
+
+library(ape)
+
+# Moran's I, null hypothesis: no spatial correlation  formula z=(I-e(I))/sqr(var(I))
+Moran.I(morany$logy, morany.dist.inv)
+
+## Panel data models
+library(plm)
+
+# ols with country fixed effects
+fixed1 <- plm(log(rgdpl) ~ openk + log(POP), 
+              data = pwt7, index  = "country", model = "within") # data from ch4
+
+# ols with country and year fixed effects
+fixed2 <- plm(log(rgdpl) ~ openk + log(POP),
+              data = pwt7, index = c("country", "year"), model = "within",
+              effect = "twoways")
+
+# random effects model
+random <- plm(log(rgdpl) ~ openk + log(POP), data = pwt7, 
+              index = c("country", "year"), model = "random")
+phtest(fixed1, random)
+
+
+
 
 
 
